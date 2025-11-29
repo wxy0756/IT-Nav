@@ -52,11 +52,6 @@ localStorage.it_nav
 
 ---
 
-# 📸 截图示例  
-（你可以把 ChatGPT 生成的 UI 图放在这里）
-
----
-
 # 🤝 欢迎使用与分享
 
 本项目可自由 Fork、修改，欢迎 PR！
