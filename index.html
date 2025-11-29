@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IT 导航</title>
+
+  <style>
+    :root {
+      --bg: #f5f6fa;
+      --card: #ffffff;
+      --text: #222;
+      --border: #ddd;
+      --hover: #e6f2ff;
+    }
+
+    [data-theme="dark"] {
+      --bg: #1e1e1e;
+      --card: #2a2a2a;
+      --text: #f1f1f1;
+      --border: #444;
+      --hover: #444d5a;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      transition: 0.4s;
+    }
+
+    header {
+      padding: 20px;
+      background: #1e90ff;
+      color: #fff;
+      text-align: center;
+      font-size: 28px;
+      font-weight: bold;
+    }
+
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      padding: 12px 20px;
+      background: var(--card);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .clock {
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    .theme-btn {
+      padding: 8px 14px;
+      border-radius: 6px;
+      background: #1e90ff;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 20px auto;
+      padding: 20px;
+      background: var(--card);
+      border-radius: 10px;
+      box-shadow: 0 0 8px rgba(0,0,0,0.1);
+      border: 1px solid var(--border);
+    }
+
+    .search-box input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      margin-bottom: 15px;
+      font-size: 16px;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .weather-box {
+      text-align: center;
+      background: var(--bg);
+      padding: 20px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      margin-bottom: 20px;
+    }
+
+    .weather-temp {
+      font-size: 32px;
+      font-weight: bold;
+    }
+
+    .nav-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 15px;
+    }
+
+    .item {
+      padding: 14px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      text-align: center;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .item:hover {
+      background: var(--hover);
+    }
+  </style>
+</head>
+
+<body>
+<header>IT 导航页</header>
+
+<div class="top-bar">
+  <div class="clock" id="clock">00:00:00</div>
+  <button class="theme-btn" onclick="toggleTheme()">亮/暗模式</button>
+</div>
+
+<div class="container">
+
+  <!-- 搜索框 -->
+  <div class="search-box">
+    <input id="searchInput" placeholder="搜索网站..." oninput="filterNav()" />
+  </div>
+
+  <!-- 天气 -->
+  <div class="weather-box">
+    <div class="weather-temp" id="wTemp">--°C</div>
+    <div id="wCity">定位中...</div>
+  </div>
+
+  <!-- 聚合搜索 -->
+  <h3>聚合搜索</h3>
+  <button onclick="searchEngine('google')">Google</button>
+  <button onclick="searchEngine('bing')">Bing</button>
+  <button onclick="searchEngine('ddg')">DuckDuckGo</button>
+
+  <!-- RSS -->
+  <h3 style="margin-top:20px;">RSS 订阅</h3>
+  <div id="rssBox">加载中…</div>
+
+  <!-- 导航 -->
+  <h3 style="margin-top:20px;">常用导航</h3>
+  <div id="navList" class="nav-grid"></div>
+
+</div>
+
+<script>
+/* 时钟 */
+function updateClock() {
+  const now = new Date();
+  document.getElementById("clock").innerText =
+    `${String(now.getHours()).padStart(2,'0')}:
+     ${String(now.getMinutes()).padStart(2,'0')}:
+     ${String(now.getSeconds()).padStart(2,'0')}`;
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+/* 亮暗模式 */
+function toggleTheme() {
+  const html = document.documentElement;
+  const next = html.getAttribute("data-theme") === "light" ? "dark" : "light";
+  html.setAttribute("data-theme", next);
+  localStorage.setItem("it_nav_theme", next);
+}
+(function() {
+  const saved = localStorage.getItem("it_nav_theme");
+  if (saved) document.documentElement.setAttribute("data-theme", saved);
+})();
+
+/* 导航数据 */
+const defaultNav = [
+  {title:"GitHub",url:"https://github.com"},
+  {title:"StackOverflow",url:"https://stackoverflow.com"},
+  {title:"V2EX",url:"https://v2ex.com"},
+  {title:"MDN",url:"https://developer.mozilla.org"}
+];
+
+function loadNav() {
+  const list = JSON.parse(localStorage.getItem("it_nav")) || defaultNav;
+  window.navData = list;
+  render(list);
+}
+
+function render(list) {
+  const box = document.getElementById("navList");
+  box.innerHTML = "";
+  list.forEach(item => {
+    const div = document.createElement("div");
+    div.className = "item";
+    div.innerHTML = `<div onclick="window.open('${item.url}')">${item.title}</div>`;
+    box.appendChild(div);
+  });
+}
+
+function filterNav() {
+  const key = document.getElementById("searchInput").value.toLowerCase();
+  const filtered = window.navData.filter(i => 
+    i.title.toLowerCase().includes(key)
+  );
+  render(filtered);
+}
+
+/* 聚合搜索 */
+function searchEngine(type) {
+  const q = prompt("输入你要搜索的内容：");
+  if (!q) return;
+  const urls = {
+    google:`https://www.g
