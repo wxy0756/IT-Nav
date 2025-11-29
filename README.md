@@ -20,3 +20,43 @@
 # 🚀 一键部署（推荐）
 
 在你的 Linux VPS 上运行：
+
+bash <(curl -s https://raw.githubusercontent.com/wxy0756/IT-Nav/main/install-it-nav.sh)
+
+部署完成后访问：
+
+http://你的服务器IP
+
+---
+
+# 📦 手动部署
+将 `index.html` 上传到服务器：
+
+/www/it-nav/index.html
+
+配置 Nginx（示例）：
+
+server { listen 80; server_name _; root /www/it-nav; index index.html; }
+
+然后重载：
+
+nginx -s reload
+
+---
+
+# 📝 自定义导航数据存储
+
+所有自定义内容都保存在浏览器：
+
+localStorage.it_nav
+
+---
+
+# 📸 截图示例  
+（你可以把 ChatGPT 生成的 UI 图放在这里）
+
+---
+
+# 🤝 欢迎使用与分享
+
+本项目可自由 Fork、修改，欢迎 PR！
